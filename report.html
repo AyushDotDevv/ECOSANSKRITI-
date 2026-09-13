@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Report an Issue</title>
+</head>
+<body>
+
+  <h1>Report an Environmental Issue</h1>
+
+  <div id="categoryButtons">
+    <button type="button" onclick="selectCategory('tree')">Tree</button>
+    <button type="button" onclick="selectCategory('water')">Water Body</button>
+  </div>
+
+  <div id="subtypeButtons" style="display: none;">
+    <div id="treeSubtypes" style="display: none;">
+      <button type="button" onclick="selectSubtype('cut')">Cut Down</button>
+      <button type="button" onclick="selectSubtype('planted')">Planted</button>
+    </div>
+
+    <div id="waterSubtypes" style="display: none;">
+      <button type="button" onclick="selectSubtype('foam')">Foam</button>
+      <button type="button" onclick="selectSubtype('algae')">Algae Bloom</button>
+      <button type="button" onclick="selectSubtype('trash')">Trash</button>
+      <button type="button" onclick="selectSubtype('dead_fish')">Dead Fish</button>
+      <button type="button" onclick="selectSubtype('odor')">Bad Odor</button>
+    </div>
+  </div>
+
+  <div id="photoSection">
+    <input type="file" accept="image/*" capture="environment" id="photoInput">
+  </div>
+ <div id="locationStatus"></div>
+  <div id="noteSection">
+    <textarea id="noteInput" placeholder="Optional note..." rows="3" cols="30"></textarea>
+  </div>
+
+  <div id="submitSection">
+    <button type="button" onclick="submitReport()">Submit Report</button>
+  </div>
+
+  <script>
+    let selectedCategory = null;
+    let selectedSubtype = null;
+    let capturedPhoto = null;
+    let capturedLat = null;
+    let capturedLng = null;
+
+    function selectCategory(category) {
+      selectedCategory = category;
+      console.log("Category selected:", selectedCategory);
+
+      document.getElementById('subtypeButtons').style.display = 'block';
+
+      if (category === 'tree') {
+        document.getElementById('treeSubtypes').style.display = 'block';
+        document.getElementById('waterSubtypes').style.display = 'none';
+      } else {
+        document.getElementById('treeSubtypes').style.display = 'none';
+        document.getElementById('waterSubtypes').style.display = 'block';
+      }
+    }
+
+    function selectSubtype(subtype) {
+      selectedSubtype = subtype;
+      console.log("Subtype selected:", selectedSubtype);
+    }
+
+    function getLocation() {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          capturedLat = position.coords.latitude;
+          capturedLng = position.coords.longitude;
+          console.log("Location captured:", capturedLat, capturedLng);
+        },
+        function(error) {
+          console.log("Location error:", error.message);
+          alert("Location access is needed to submit a report.");
+        }
+      );
+    }
+
+    document.getElementById('photoInput').addEventListener('change', function(event) {
+      capturedPhoto = event.target.files[0];
+      console.log("Photo captured:", capturedPhoto);
+      getLocation();
+    });
+
+    function submitReport() {
+      if (!selectedCategory) {
+        alert("Please select a category (Tree or Water Body).");
+        return;
+      }
+      if (!selectedSubtype) {
+        alert("Please select a subtype.");
+        return;
+      }
+      if (!capturedPhoto) {
+        alert("Please take a photo.");
+        return;
+      }
+      if (capturedLat === null || capturedLng === null) {
+        alert("Location not captured yet. Please try taking the photo again.");
+        return;
+      }
+
+      const report = {
+        id: Date.now().toString(),
+        category: selectedCategory,
+        subtype: selectedSubtype,
+        lat: capturedLat,
+        lng: capturedLng,
+        timestamp: new Date().toISOString(),
+        note: document.getElementById('noteInput').value,
+        photo: capturedPhoto,
+        locationName: "" // to be filled in later, manually or via geocoding
+      };
+
+      console.log("Report submitted:", report);
+      alert("Report submitted! Check the console for details.");
+    }
+  </script>
+
+</body>
+</html>
