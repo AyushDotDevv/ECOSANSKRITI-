@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Footprint Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+  h3 { margin-top: 30px; }
+  label { font-weight: bold; }
+  input, select { padding: 8px; margin-top: 5px; width: 100%; box-sizing: border-box; }
+  button { margin-top: 30px; padding: 14px; width: 100%; background: #2e7d32; color: white; border: none; font-size: 16px; cursor: pointer; }
+  #results { margin-top: 30px; padding: 20px; background: #f4f4f4; display: none; }
+  .total { font-size: 28px; font-weight: bold; }
+  .tip { margin-bottom: 10px; }
+  .breakdown-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #ccc; }
+  details { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+  <h1>Calculate Your Carbon Footprint</h1>
+
+  <h3>Commute</h3>
+  <label>Mode of transport:</label>
+  <select id="modeSelect">
+    <option value="0.171">Car (petrol)</option>
+    <option value="0.055">Two-wheeler</option>
+    <option value="0.105">Bus</option>
+    <option value="0.041">Train / Metro</option>
+    <option value="0">Walk / Cycle</option>
+  </select>
+
+  <label>One-way distance (km):</label>
+  <input type="number" id="distanceInput" value="10">
+
+  <label>Commute days per month:</label>
+  <input type="number" id="daysInput" value="22">
+
+  <h3>Household Electricity</h3>
+  <label>Total household units this month (kWh):</label>
+  <input type="number" id="electricityInput" value="250">
+
+  <label>People in household:</label>
+  <input type="number" id="householdElecInput" value="4">
+
+  <h3>Diet</h3>
+  <select id="dietSelect">
+    <option value="150">Vegetarian</option>
+    <option value="180">Eggetarian</option>
+    <option value="220">Non-veg (occasional)</option>
+    <option value="300">Non-veg (daily)</option>
+  </select>
+
+  <h3>LPG</h3>
+  <label>Cylinders used this month (household):</label>
+  <input type="number" id="lpgInput" value="1" step="0.1">
+
+  <label>People sharing this cylinder:</label>
+  <input type="number" id="householdLpgInput" value="4">
+
+  <button onclick="calculateFootprint()">Calculate My Footprint</button>
+
+  <div id="results">
+    <div class="total" id="totalDisplay"></div>
+    <p id="comparisonText"></p>
+
+    <h3>Breakdown</h3>
+    <div id="breakdownList"></div>
+
+    <h3>Your Priority Moves</h3>
+    <div id="tipsList"></div>
+
+    <details>
+      <summary>Basis of calculation</summary>
+      <div id="calcBasis"></div>
+    </details>
+  </div>
+
+  <script>
+    const ELEC_FACTOR = 0.79;
+    const LPG_FACTOR = 42;
+    const AVERAGE_FOOTPRINT = 180;
+
+    const tips = {
+      Transport: [
+        "Carpool 2-3 days a week — even sharing your ride with one other person roughly halves your commute footprint on those days.",
+        "If part of your route has a bus or metro option, shifting even a portion of the trip to shared transport cuts emissions per passenger significantly.",
+        "Keep your vehicle serviced and tires properly inflated — poor maintenance alone can increase fuel use by 10-15%."
+      ],
+      Electricity: [
+        "Check for standby power draw — chargers, routers, and appliances left plugged in add up over a month.",
+        "Get ACs and geysers serviced regularly; poorly maintained units can use significantly more electricity for the same output.",
+        "Shift high-usage appliance time to cooler parts of the day where possible to reduce AC load."
+      ],
+      Diet: [
+        "Cutting non-veg meals by even 2 days a week measurably lowers this category over a month.",
+        "Reducing food waste at home indirectly lowers the effective footprint of groceries bought.",
+        "Choosing seasonal, local produce when possible tends to have a lower footprint than out-of-season imported items."
+      ],
+      LPG: [
+        "Use lids while cooking and match flame size to the pan — both reduce gas consumption noticeably over time.",
+        "Pressure cooking for suitable dishes cuts cooking time and gas use compared to open-pot cooking.",
+        "If the cylinder is shared across a household, confirm your usage split is being estimated fairly."
+      ]
+    };
+
+    function calculateFootprint() {
+      const modeFactor = parseFloat(document.getElementById('modeSelect').value);
+      const distance = parseFloat(document.getElementById('distanceInput').value) || 0;
+      const days = parseFloat(document.getElementById('daysInput').value) || 0;
+
+      const electricityTotal = parseFloat(document.getElementById('electricityInput').value) || 0;
+      const householdElec = parseFloat(document.getElementById('householdElecInput').value) || 1;
+
+      const dietKg = parseFloat(document.getElementById('dietSelect').value);
+
+      const lpgTotal = parseFloat(document.getElementById('lpgInput').value) || 0;
+      const householdLpg = parseFloat(document.getElementById('householdLpgInput').value) || 1;
+
+      const transportKg = distance * 2 * days * modeFactor;
+      const electricityShare = electricityTotal / householdElec;
+      const electricityKg = electricityShare * ELEC_FACTOR;
+      const lpgShare = lpgTotal / householdLpg;
+      const lpgKg = lpgShare * LPG_FACTOR;
+
+      const total = transportKg + electricityKg + dietKg + lpgKg;
+      const low = Math.round(total * 0.9);
+      const high = Math.round(total * 1.1);
+
+      document.getElementById('totalDisplay').textContent = low + "–" + high + " kg CO2 / month";
+
+      const diffPct = Math.round(((total - AVERAGE_FOOTPRINT) / AVERAGE_FOOTPRINT) * 100);
+      if (total < AVERAGE_FOOTPRINT) {
+        document.getElementById('comparisonText').textContent =
+          "That's about " + Math.abs(diffPct) + "% below the India national average (~180 kg/month).";
+      } else {
+        document.getElementById('comparisonText').textContent =
+          "That's about " + diffPct + "% above the India national average (~180 kg/month).";
+      }
+
+      const segments = [
+        { label: "Transport", val: transportKg },
+        { label: "Electricity", val: electricityKg },
+        { label: "Diet", val: dietKg },
+        { label: "LPG", val: lpgKg }
+      ];
+
+      document.getElementById('breakdownList').innerHTML = segments.map(s =>
+        "<div class='breakdown-item'><span>" + s.label + "</span><span>" +
+        s.val.toFixed(1) + " kg (" + (s.val / total * 100).toFixed(0) + "%)</span></div>"
+      ).join('');
+
+      const biggest = segments.reduce((a, b) => b.val > a.val ? b : a);
+      document.getElementById('tipsList').innerHTML =
+        "<p><b>Biggest contributor: " + biggest.label + " (" + (biggest.val / total * 100).toFixed(0) + "%)</b></p>" +
+        tips[biggest.label].map(t => "<div class='tip'>• " + t + "</div>").join('');
+
+      document.getElementById('calcBasis').innerHTML =
+        "<p>Electricity: 0.79 kg CO2/kWh — CEA India grid average</p>" +
+        "<p>Transport: mode-specific per-km factor — DEFRA/IPCC</p>" +
+        "<p>Diet: 150–300 kg CO2/month by category — published dietary-footprint studies</p>" +
+        "<p>LPG: 42 kg CO2 per 14.2kg cylinder — standard combustion factor</p>" +
+        "<p>Reference average: ~180 kg CO2/month — India national per-capita, EDGAR/JRC 2025</p>";
+
+      document.getElementById('results').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
