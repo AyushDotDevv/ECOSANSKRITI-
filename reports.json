@@ -1,0 +1,42 @@
+[
+  {
+    "category": "tree",
+    "subtype": "Felled Banyan Branch",
+    "lat": 12.9394,
+    "lng": 77.598,
+    "timestamp": "2026-09-15",
+    "note": "Large historic banyan branch collapsed onto pedestrian path near Jayanagar 4th Block."
+  },
+  {
+    "category": "water",
+    "subtype": "Chemical Effluent Foam",
+    "lat": 12.9352,
+    "lng": 77.6907,
+    "timestamp": "2026-09-17",
+    "note": "White chemical froth accumulating along the western outflow weir of Bellandur Lake."
+  },
+  {
+    "category": "tree",
+    "subtype": "Urban Canopy Sapling Drive",
+    "lat": 12.9783,
+    "lng": 77.6408,
+    "timestamp": "2026-09-18",
+    "note": "15 indigenous honge and neem saplings planted by resident volunteers on Ulsoor Road."
+  },
+  {
+    "category": "water",
+    "subtype": "Algae Bloom & Oxygen Depletion",
+    "lat": 13.0298,
+    "lng": 77.6199,
+    "timestamp": "2026-09-16",
+    "note": "Dense green surface algae layer extending across 200m of Hebbal Lake southern shoreline."
+  },
+  {
+    "category": "water",
+    "subtype": "Plastic Debris Inflow",
+    "lat": 12.9091,
+    "lng": 77.6042,
+    "timestamp": "2026-09-19",
+    "note": "Post-rain debris blockage causing single-use plastics to enter Madivala Lake inlet."
+  }
+]

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVS — Environmental Vigilance System | Real-time Incident Monitoring</title>
+
+  <!-- Typography: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <style>
+    .home-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-section {
+      padding: var(--space-8) var(--space-6) var(--space-6);
+      text-align: center;
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-full);
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      color: #34d399;
+      margin-bottom: var(--space-4);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.25rem, 5vw, 3.75rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 0 0 var(--space-4);
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title .gradient-text {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: var(--fs-lg);
+      color: var(--color-text-muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin: 0 0 var(--space-6);
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-7);
+      flex-wrap: wrap;
+    }
+
+    /* Live KPI Ribbon */
+    .kpi-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-4);
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: var(--space-8);
+    }
+
+    .kpi-card {
+      padding: var(--space-4) var(--space-5);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .kpi-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .kpi-val {
+      font-size: var(--fs-2xl);
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    .kpi-label {
+      font-size: var(--fs-xs);
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-5);
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto var(--space-8);
+      padding: 0 var(--space-6);
+    }
+
+    .feature-card {
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .feature-card__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feature-card__title {
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: #ffffff;
+      margin: 0 0 var(--space-2);
+    }
+
+    .feature-card__desc {
+      font-size: var(--fs-sm);
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin: 0 0 var(--space-5);
+      flex: 1;
+    }
+
+    /* Recent Feed Section */
+    .feed-section {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto var(--space-8);
+      padding: 0 var(--space-6);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .section-title {
+      font-size: var(--fs-xl);
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .feed-item {
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Footer */
+    .app-footer {
+      border-top: 1px solid var(--glass-border);
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      padding: var(--space-5) var(--space-6);
+      text-align: center;
+      font-size: var(--fs-xs);
+      color: var(--color-text-dim);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glowing Mesh Background -->
+  <div class="ambient-bg">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <div class="home-wrapper">
+    <!-- Top Glass Navigation Bar -->
+    <header class="app-header">
+      <div class="app-header__brand">
+        <div class="brand-icon-wrap">🌿</div>
+        <div>
+          <span>EVS</span>
+          <span style="font-weight:400;font-size:var(--fs-sm);color:var(--color-text-muted);margin-left:6px;">
+            Environmental Vigilance System
+          </span>
+        </div>
+      </div>
+
+      <nav class="app-header__nav">
+        <a href="map.html" class="btn btn-glass">
+          🗺️ Live Map
+        </a>
+        <button id="open-report-btn" class="btn btn-primary" type="button">
+          + Submit Report
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Hero -->
+    <main class="hero-section">
+      <div class="hero-badge">
+        <span>⚡ Live Regional Geospatial Vigilance</span>
+      </div>
+
+      <h1 class="hero-title">
+        Empowering Communities,<br />
+        <span class="gradient-text">Protecting Our Ecosystem.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Document tree felling, lake pollution, and toxic foam incidents in real time. Plotted live on geospatial layers with community tracking and verification.
+      </p>
+
+      <div class="hero-actions">
+        <a href="map.html" class="btn btn-primary" style="padding:14px 28px;font-size:var(--fs-md);">
+          🗺️ Explore Live Map
+        </a>
+        <button id="hero-report-btn" class="btn btn-glass" style="padding:14px 24px;font-size:var(--fs-md);" type="button">
+          📝 Submit Incident Report
+        </button>
+      </div>
+
+      <!-- Live KPI Metrics Ribbon -->
+      <div class="kpi-ribbon">
+        <div class="kpi-card glass-card">
+          <div class="kpi-icon" style="background:rgba(2, 132, 199, 0.15);color:#38bdf8;">
+            📡
+          </div>
+          <div>
+            <div id="kpi-total" class="kpi-val">18</div>
+            <div class="kpi-label">Active Reports</div>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-card">
+          <div class="kpi-icon" style="background:rgba(16, 185, 129, 0.15);color:#34d399;">
+            🌲
+          </div>
+          <div>
+            <div id="kpi-tree" class="kpi-val">7</div>
+            <div class="kpi-label">Forestry / Trees</div>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-card">
+          <div class="kpi-icon" style="background:rgba(2, 132, 199, 0.15);color:#38bdf8;">
+            💧
+          </div>
+          <div>
+            <div id="kpi-water" class="kpi-val">11</div>
+            <div class="kpi-label">Water Incidents</div>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-card">
+          <div class="kpi-icon" style="background:rgba(249, 115, 22, 0.15);color:#fb923c;">
+            ⚠️
+          </div>
+          <div>
+            <div id="kpi-alerts" class="kpi-val">6</div>
+            <div class="kpi-label">High Severity Alerts</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Interactive Feature Grid -->
+    <section class="feature-grid">
+      <!-- Feature Card 1: Interactive Map -->
+      <div class="feature-card glass-card" onclick="window.location.href='map.html'">
+        <div>
+          <div class="feature-card__icon" style="background:var(--gradient-water);color:#fff;">
+            🗺️
+          </div>
+          <h3 class="feature-card__title">Interactive Map View</h3>
+          <p class="feature-card__desc">
+            Visualize all reported events on vector street, satellite imagery, or dark mode layers. Features custom subtype pins, live GPS user pointer, search, and direction navigation.
+          </p>
+        </div>
+        <div>
+          <a href="map.html" class="btn btn-secondary" style="width:100%;">
+            Launch Map Cockpit →
+          </a>
+        </div>
+      </div>
+
+      <!-- Feature Card 2: Report Incident -->
+      <div class="feature-card glass-card" id="card-submit-report">
+        <div>
+          <div class="feature-card__icon" style="background:var(--gradient-tree);color:#fff;">
+            📝
+          </div>
+          <h3 class="feature-card__title">Submit Incident Report</h3>
+          <p class="feature-card__desc">
+            Instantly log illegal tree felling, lake foam, algae blooms, or industrial discharge. Auto-detect GPS coordinates, upload photo evidence, and pinpoint on regional maps.
+          </p>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary" style="width:100%;" onclick="openHomeReportModal()">
+            Log New Report Now +
+          </button>
+        </div>
+      </div>
+
+      <!-- Feature Card 3: Data Export & Transparency -->
+      <div class="feature-card glass-card">
+        <div>
+          <div class="feature-card__icon" style="background:var(--gradient-alert);color:#fff;">
+            📊
+          </div>
+          <h3 class="feature-card__title">Open Environmental Data</h3>
+          <p class="feature-card__desc">
+            Download verified incident logs for civic reporting, environmental advocacy, and research. Export the full incident dataset in JSON or spreadsheet-ready CSV formats.
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="home-export-csv" class="btn btn-glass" style="flex:1;" type="button">
+            📥 CSV Export
+          </button>
+          <button id="home-export-json" class="btn btn-glass" style="flex:1;" type="button">
+            📦 JSON
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Incident Activity Feed -->
+    <section class="feed-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>📡</span> Latest Community Observations
+        </h2>
+        <a href="map.html" class="btn btn-glass" style="font-size:var(--fs-xs);">
+          View All on Map →
+        </a>
+      </div>
+
+      <div id="home-recent-feed" class="feed-grid">
+        <!-- Injected via JavaScript from storage -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p style="margin:0 0 4px;">
+        Environmental Vigilance System (EVS) — Pure Web App Architecture (HTML5 / CSS3 / JavaScript).
+      </p>
+      <p style="margin:0;">
+        Open civic monitoring platform for ecological preservation.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Glassmorphic Incident Report Modal -->
+  <div id="report-modal" class="modal-backdrop">
+    <div class="modal-container">
+      <button id="report-modal-close" class="modal-close-btn" type="button" title="Close">✕</button>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:1.5rem;">📝</span>
+        <h2 style="margin:0;font-size:var(--fs-xl);font-family:var(--font-display);font-weight:700;color:#fff;">
+          Submit Incident Report
+        </h2>
+      </div>
+      <p style="color:var(--color-text-muted);font-size:var(--fs-sm);margin:0 0 20px;">
+        Log an environmental occurrence. It will be recorded and instantly visible on the map.
+      </p>
+
+      <form id="home-report-form" class="report-form-grid" style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Category Selection -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            Domain Category
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button type="button" id="cat-tree-btn" class="btn btn-glass is-active" style="border-color:var(--color-tree);color:#34d399;">
+              <span>🌳</span> Forestry &amp; Greenery
+            </button>
+            <button type="button" id="cat-water-btn" class="btn btn-glass">
+              <span>💧</span> Water Bodies
+            </button>
+          </div>
+        </div>
+
+        <!-- Subtype Selection -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            Classification
+          </label>
+          <div id="home-subtype-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:8px;"></div>
+        </div>
+
+        <!-- Location Name -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            Location / Landmark
+          </label>
+          <input type="text" id="home-loc-name" class="input-glass" placeholder="e.g. Bellandur Lake Western Bund, Jayanagar 4th Block" required />
+        </div>
+
+        <!-- GPS Coordinates -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            GPS Coordinates
+          </label>
+          <div style="display:flex;gap:8px;">
+            <input type="number" step="any" id="home-lat" class="input-glass" placeholder="Latitude" value="12.9716" required />
+            <input type="number" step="any" id="home-lng" class="input-glass" placeholder="Longitude" value="77.5946" required />
+            <button type="button" id="home-get-gps" class="btn btn-secondary" style="white-space:nowrap;">
+              📍 Auto GPS
+            </button>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            Observation Notes
+          </label>
+          <textarea id="home-note" class="textarea-glass" rows="3" placeholder="Describe the occurrence and extent..."></textarea>
+        </div>
+
+        <!-- Photo file upload -->
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+          <label class="form-label" style="font-size:var(--fs-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">
+            Attach Photo (Optional)
+          </label>
+          <input type="file" id="home-photo-input" accept="image/*" style="display:none;" />
+          <div id="home-photo-drop" class="glass-card" style="padding:16px;text-align:center;cursor:pointer;border-style:dashed;">
+            <span style="font-size:1.5rem;display:block;margin-bottom:4px;">📸</span>
+            <span style="font-size:var(--fs-sm);font-weight:600;color:var(--color-text);">Click to upload photo evidence</span>
+          </div>
+          <div id="home-photo-preview-wrap" style="display:none;position:relative;margin-top:8px;">
+            <img id="home-photo-preview" style="width:100%;max-height:140px;object-fit:cover;border-radius:var(--radius-xs);border:1px solid var(--glass-border);" alt="Preview" />
+            <button type="button" id="home-photo-remove" class="modal-close-btn" style="top:6px;right:6px;width:24px;height:24px;font-size:12px;">✕</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button type="submit" class="btn btn-primary" style="flex:2;padding:12px;">
+            🚀 Submit &amp; Plot on Map
+          </button>
+          <button type="button" class="btn btn-glass" onclick="closeHomeReportModal()" style="flex:1;">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/sample-data.js"></script>
+  <script src="js/storage.js"></script>
+  <script>
+    // Home Dashboard Logic
+    let currentCategory = "tree";
+    let currentSubtype = "cut";
+    let attachedPhotoBase64 = null;
+
+    function initHomePage() {
+      updateKpis();
+      renderRecentFeed();
+      wireHomeEvents();
+      renderHomeSubtypes();
+    }
+
+    function updateKpis() {
+      const stats = getReportStats();
+      document.getElementById("kpi-total").textContent = stats.total;
+      document.getElementById("kpi-tree").textContent = stats.tree;
+      document.getElementById("kpi-water").textContent = stats.water;
+      document.getElementById("kpi-alerts").textContent = stats.alerts;
+    }
+
+    function renderRecentFeed() {
+      const feedEl = document.getElementById("home-recent-feed");
+      if (!feedEl) return;
+
+      const reports = getAllReports().slice(0, 3);
+      if (!reports.length) {
+        feedEl.innerHTML = `<p style="color:var(--color-text-muted);">No reports logged yet.</p>`;
+        return;
+      }
+
+      feedEl.innerHTML = reports.map(r => {
+        const icon = getSubtypeIcon(r.subtype);
+        const subtypeLabel = getSubtypeLabel(r.subtype);
+        const color = getReportColor(r);
+        const ago = timeAgo(r.timestamp);
+        const isAlert = EVS_ALERT_SUBTYPES.has(r.subtype);
+
+        return `
+          <div class="feed-item glass-card" onclick="window.location.href='map.html?report=${r.id}'" style="cursor:pointer;" title="Click to view on map">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span class="badge ${isAlert ? 'badge-alert' : r.category === 'tree' ? 'badge-tree' : 'badge-water'}">
+                ${icon} ${subtypeLabel}
+              </span>
+              <span style="font-size:var(--fs-xs);color:var(--color-text-dim);">🕒 ${ago}</span>
+            </div>
+            <div style="font-weight:700;font-size:var(--fs-md);color:#fff;margin-top:4px;">
+              ${escapeHTML(r.locationName || "Bangalore")}
+            </div>
+            <div style="font-size:var(--fs-sm);color:var(--color-text-muted);line-height:1.4;">
+              "${escapeHTML(r.note ? (r.note.length > 80 ? r.note.slice(0, 80) + '...' : r.note) : 'Incident reported by community observer.')}"
+            </div>
+            <div style="font-size:var(--fs-xs);color:var(--color-water);display:flex;align-items:center;gap:4px;margin-top:6px;">
+              <span>View coordinates (${r.lat.toFixed(3)}, ${r.lng.toFixed(3)}) →</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderHomeSubtypes() {
+      const container = document.getElementById("home-subtype-grid");
+      if (!container) return;
+
+      const validSubtypes = currentCategory === "tree" ? ["cut", "planted"] : ["foam", "algae", "trash", "dead_fish", "odor"];
+      if (!validSubtypes.includes(currentSubtype)) {
+        currentSubtype = validSubtypes[0];
+      }
+
+      container.innerHTML = validSubtypes.map(st => {
+        const isActive = st === currentSubtype;
+        const icon = getSubtypeIcon(st);
+        return `
+          <button type="button" class="btn btn-glass" style="${isActive ? 'background:rgba(255,255,255,0.2);border-color:#38bdf8;color:#fff;' : 'font-size:var(--fs-xs);'}padding:8px;" data-subtype="${st}">
+            ${icon} ${getSubtypeLabel(st)}
+          </button>
+        `;
+      }).join("");
+
+      container.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentSubtype = btn.getAttribute("data-subtype");
+          renderHomeSubtypes();
+        });
+      });
+    }
+
+    function wireHomeEvents() {
+      // Open Modal Buttons
+      const openBtn = document.getElementById("open-report-btn");
+      const heroReportBtn = document.getElementById("hero-report-btn");
+      const cardReport = document.getElementById("card-submit-report");
+
+      if (openBtn) openBtn.addEventListener("click", openHomeReportModal);
+      if (heroReportBtn) heroReportBtn.addEventListener("click", openHomeReportModal);
+      if (cardReport) cardReport.addEventListener("click", openHomeReportModal);
+
+      // Close Modal
+      const closeBtn = document.getElementById("report-modal-close");
+      const modal = document.getElementById("report-modal");
+      if (closeBtn) closeBtn.addEventListener("click", closeHomeReportModal);
+      if (modal) {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeHomeReportModal();
+        });
+      }
+
+      // Category buttons
+      const treeBtn = document.getElementById("cat-tree-btn");
+      const waterBtn = document.getElementById("cat-water-btn");
+      if (treeBtn && waterBtn) {
+        treeBtn.addEventListener("click", () => {
+          currentCategory = "tree";
+          treeBtn.style.borderColor = "var(--color-tree)";
+          treeBtn.style.color = "#34d399";
+          waterBtn.style.borderColor = "";
+          waterBtn.style.color = "";
+          renderHomeSubtypes();
+        });
+        waterBtn.addEventListener("click", () => {
+          currentCategory = "water";
+          waterBtn.style.borderColor = "var(--color-water)";
+          waterBtn.style.color = "#38bdf8";
+          treeBtn.style.borderColor = "";
+          treeBtn.style.color = "";
+          renderHomeSubtypes();
+        });
+      }
+
+      // Auto GPS
+      const gpsBtn = document.getElementById("home-get-gps");
+      if (gpsBtn) {
+        gpsBtn.addEventListener("click", () => {
+          gpsBtn.textContent = "Detecting...";
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              document.getElementById("home-lat").value = pos.coords.latitude.toFixed(5);
+              document.getElementById("home-lng").value = pos.coords.longitude.toFixed(5);
+              gpsBtn.textContent = "✓ GPS Found";
+              setTimeout(() => gpsBtn.textContent = "📍 Auto GPS", 1500);
+            },
+            () => {
+              document.getElementById("home-lat").value = (12.9716 + (Math.random() * 0.04 - 0.02)).toFixed(5);
+              document.getElementById("home-lng").value = (77.5946 + (Math.random() * 0.04 - 0.02)).toFixed(5);
+              gpsBtn.textContent = "Bangalore Pin";
+              setTimeout(() => gpsBtn.textContent = "📍 Auto GPS", 1500);
+            }
+          );
+        });
+      }
+
+      // Photo upload
+      const photoInput = document.getElementById("home-photo-input");
+      const photoDrop = document.getElementById("home-photo-drop");
+      const photoPreviewWrap = document.getElementById("home-photo-preview-wrap");
+      const photoPreviewImg = document.getElementById("home-photo-preview");
+      const removePhoto = document.getElementById("home-photo-remove");
+
+      if (photoDrop && photoInput) {
+        photoDrop.addEventListener("click", () => photoInput.click());
+        photoInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              attachedPhotoBase64 = evt.target.result;
+              photoPreviewImg.src = attachedPhotoBase64;
+              photoPreviewWrap.style.display = "block";
+              photoDrop.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      if (removePhoto) {
+        removePhoto.addEventListener("click", () => {
+          attachedPhotoBase64 = null;
+          photoInput.value = "";
+          photoPreviewWrap.style.display = "none";
+          photoDrop.style.display = "block";
+        });
+      }
+
+      // Form submission
+      const form = document.getElementById("home-report-form");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const locationName = document.getElementById("home-loc-name").value.trim() || "Observed Site";
+          const lat = parseFloat(document.getElementById("home-lat").value);
+          const lng = parseFloat(document.getElementById("home-lng").value);
+          const note = document.getElementById("home-note").value.trim();
+
+          const report = {
+            id: "evs-" + Date.now(),
+            category: currentCategory,
+            subtype: currentSubtype,
+            locationName,
+            lat,
+            lng,
+            timestamp: new Date().toISOString(),
+            note,
+            photo: attachedPhotoBase64,
+          };
+
+          saveReport(report);
+          closeHomeReportModal();
+          updateKpis();
+          renderRecentFeed();
+          showToast(`Report logged! Redirecting to map view...`);
+          setTimeout(() => {
+            window.location.href = `map.html?report=${report.id}`;
+          }, 1400);
+        });
+      }
+
+      // Export buttons
+      const exportCsv = document.getElementById("home-export-csv");
+      const exportJson = document.getElementById("home-export-json");
+      if (exportCsv) exportCsv.addEventListener("click", () => exportReportsCSV(getAllReports()));
+      if (exportJson) exportJson.addEventListener("click", () => exportReportsJSON(getAllReports()));
+    }
+
+    function openHomeReportModal() {
+      document.getElementById("report-modal").classList.add("is-open");
+    }
+
+    function closeHomeReportModal() {
+      document.getElementById("report-modal").classList.remove("is-open");
+    }
+
+    function showToast(message) {
+      let toast = document.getElementById("evs-toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "evs-toast";
+        toast.className = "toast";
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+      toast.classList.add("is-visible");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove("is-visible"), 2500);
+    }
+
+    document.addEventListener("DOMContentLoaded", initHomePage);
+  </script>
+</body>
+</html>
