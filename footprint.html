@@ -2,77 +2,206 @@
 <html>
 <head>
 <title>Footprint Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
-  h3 { margin-top: 30px; }
-  label { font-weight: bold; }
-  input, select { padding: 8px; margin-top: 5px; width: 100%; box-sizing: border-box; }
-  button { margin-top: 30px; padding: 14px; width: 100%; background: #2e7d32; color: white; border: none; font-size: 16px; cursor: pointer; }
-  #results { margin-top: 30px; padding: 20px; background: #f4f4f4; display: none; }
-  .total { font-size: 28px; font-weight: bold; }
-  .tip { margin-bottom: 10px; }
-  .breakdown-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #ccc; }
-  details { margin-top: 20px; }
+  :root {
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-border: #e2e8f0;
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-tree: #166534;
+    --color-tree-bg: #dcfce7;
+    --color-accent: #c2410c;
+    --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: var(--font-system);
+    background: var(--color-bg);
+    color: var(--color-text);
+    max-width: 560px;
+    margin: 30px auto;
+    padding: 0 20px 60px;
+  }
+  .back-link { display: inline-block; margin-bottom: 20px; color: var(--color-text-muted); text-decoration: none; font-size: 14px; }
+  .back-link:hover { color: var(--color-text); }
+
+  .step-indicator { display: flex; gap: 6px; margin-bottom: 24px; }
+  .step-dot { flex: 1; height: 4px; border-radius: 4px; background: var(--color-border); }
+  .step-dot.active { background: var(--color-tree); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .step-sub { color: var(--color-text-muted); font-size: 14px; margin-bottom: 24px; }
+
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(15,23,42,0.06);
+    margin-bottom: 20px;
+  }
+
+  h3 { margin-top: 0; margin-bottom: 14px; font-size: 13px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px; }
+  input, select {
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  input:last-child, select:last-child { margin-bottom: 0; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  button {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+  }
+  .btn-primary { background: var(--color-tree); color: white; box-shadow: 0 4px 14px rgba(22,101,52,0.25); }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-ghost { background: transparent; color: var(--color-text-muted); border: 1px solid var(--color-border); }
+
+  #results {
+    padding: 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(15,23,42,0.08);
+  }
+  .total { font-size: 32px; font-weight: 700; text-align: center; color: var(--color-tree); }
+  .tip {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--color-tree-bg);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--color-border);
+    font-size: 14px;
+  }
+  details { margin-top: 20px; font-size: 13px; color: var(--color-text-muted); }
+  summary { cursor: pointer; font-weight: 600; }
 </style>
 </head>
 <body>
 
-  <h1>Calculate Your Carbon Footprint</h1>
+  <a href="index.html" class="back-link">← Back to Home</a>
 
-  <h3>Commute</h3>
-  <label>Mode of transport:</label>
-  <select id="modeSelect">
-    <option value="0.171">Car (petrol)</option>
-    <option value="0.055">Two-wheeler</option>
-    <option value="0.105">Bus</option>
-    <option value="0.041">Train / Metro</option>
-    <option value="0">Walk / Cycle</option>
-  </select>
+  <div class="step-indicator">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
 
-  <label>One-way distance (km):</label>
-  <input type="number" id="distanceInput" value="10">
+  <!-- STEP 1: COMMUTE -->
+  <div class="screen active" id="step1">
+    <h1>Your Commute</h1>
+    <p class="step-sub">Step 1 of 3</p>
 
-  <label>Commute days per month:</label>
-  <input type="number" id="daysInput" value="22">
+    <div class="card">
+      <h3>Commute</h3>
+      <label>Mode of transport:</label>
+      <select id="modeSelect">
+        <option value="0.171">Car (petrol)</option>
+        <option value="0.055">Two-wheeler</option>
+        <option value="0.105">Bus</option>
+        <option value="0.041">Train / Metro</option>
+        <option value="0">Walk / Cycle</option>
+      </select>
 
-  <h3>Household Electricity</h3>
-  <label>Total household units this month (kWh):</label>
-  <input type="number" id="electricityInput" value="250">
+      <label>One-way distance (km):</label>
+      <input type="number" id="distanceInput" value="10">
 
-  <label>People in household:</label>
-  <input type="number" id="householdElecInput" value="4">
+      <label>Commute days per month:</label>
+      <input type="number" id="daysInput" value="22">
+    </div>
 
-  <h3>Diet</h3>
-  <select id="dietSelect">
-    <option value="150">Vegetarian</option>
-    <option value="180">Eggetarian</option>
-    <option value="220">Non-veg (occasional)</option>
-    <option value="300">Non-veg (daily)</option>
-  </select>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(2)">Next →</button>
+    </div>
+  </div>
 
-  <h3>LPG</h3>
-  <label>Cylinders used this month (household):</label>
-  <input type="number" id="lpgInput" value="1" step="0.1">
+  <!-- STEP 2: HOUSEHOLD, DIET, LPG -->
+  <div class="screen" id="step2">
+    <h1>Household & Diet</h1>
+    <p class="step-sub">Step 2 of 3</p>
 
-  <label>People sharing this cylinder:</label>
-  <input type="number" id="householdLpgInput" value="4">
+    <div class="card">
+      <h3>Household Electricity</h3>
+      <label>Total household units this month (kWh):</label>
+      <input type="number" id="electricityInput" value="250">
 
-  <button onclick="calculateFootprint()">Calculate My Footprint</button>
+      <label>People in household:</label>
+      <input type="number" id="householdElecInput" value="4">
+    </div>
 
-  <div id="results">
-    <div class="total" id="totalDisplay"></div>
-    <p id="comparisonText"></p>
+    <div class="card">
+      <h3>Diet</h3>
+      <select id="dietSelect">
+        <option value="150">Vegetarian</option>
+        <option value="180">Eggetarian</option>
+        <option value="220">Non-veg (occasional)</option>
+        <option value="300">Non-veg (daily)</option>
+      </select>
+    </div>
 
-    <h3>Breakdown</h3>
-    <div id="breakdownList"></div>
+    <div class="card">
+      <h3>LPG</h3>
+      <label>Cylinders used this month (household):</label>
+      <input type="number" id="lpgInput" value="1" step="0.1">
 
-    <h3>Your Priority Moves</h3>
-    <div id="tipsList"></div>
+      <label>People sharing this cylinder:</label>
+      <input type="number" id="householdLpgInput" value="4">
+    </div>
 
-    <details>
-      <summary>Basis of calculation</summary>
-      <div id="calcBasis"></div>
-    </details>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary" onclick="calculateFootprint()">Calculate →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: RESULTS -->
+  <div class="screen" id="step3">
+    <h1>Your Footprint</h1>
+    <p class="step-sub">Step 3 of 3</p>
+
+    <div id="results">
+      <div class="total" id="totalDisplay"></div>
+      <p id="comparisonText" style="text-align:center; color:var(--color-text-muted); font-size:14px; margin-top:8px;"></p>
+
+      <h3 style="margin-top:24px;">Breakdown</h3>
+      <div id="breakdownList"></div>
+
+      <h3>Your Priority Moves</h3>
+      <div id="tipsList"></div>
+
+      <details>
+        <summary>Basis of calculation</summary>
+        <div id="calcBasis"></div>
+      </details>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(2)">← Back</button>
+      <button class="btn-ghost" onclick="restart()">Start Over</button>
+    </div>
   </div>
 
   <script>
@@ -102,6 +231,21 @@
         "If the cylinder is shared across a household, confirm your usage split is being estimated fairly."
       ]
     };
+
+    function goToStep(step) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + step).classList.add('active');
+
+      document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+      for (let i = 1; i <= step; i++) {
+        document.getElementById('dot' + i).classList.add('active');
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function restart() {
+      goToStep(1);
+    }
 
     function calculateFootprint() {
       const modeFactor = parseFloat(document.getElementById('modeSelect').value);
@@ -151,7 +295,7 @@
 
       const biggest = segments.reduce((a, b) => b.val > a.val ? b : a);
       document.getElementById('tipsList').innerHTML =
-        "<p><b>Biggest contributor: " + biggest.label + " (" + (biggest.val / total * 100).toFixed(0) + "%)</b></p>" +
+        "<p style='margin-bottom:10px; font-weight:600;'>Biggest contributor: " + biggest.label + " (" + (biggest.val / total * 100).toFixed(0) + "%)</p>" +
         tips[biggest.label].map(t => "<div class='tip'>• " + t + "</div>").join('');
 
       document.getElementById('calcBasis').innerHTML =
@@ -161,9 +305,6 @@
         "<p>LPG: 42 kg CO2 per 14.2kg cylinder — standard combustion factor</p>" +
         "<p>Reference average: ~180 kg CO2/month — India national per-capita, EDGAR/JRC 2025</p>";
 
-      document.getElementById('results').style.display = 'block';
+      goToStep(3);
     }
   </script>
-
-</body>
-</html>

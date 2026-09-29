@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoSanskriti</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-border: #e2e8f0;
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-tree: #166534;
+    --color-tree-bg: #dcfce7;
+    --color-water: #0284c7;
+    --color-water-bg: #e0f2fe;
+    --color-accent: #c2410c;
+    --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --radius-card: 14px;
+    --shadow-soft: 0 4px 20px rgba(15, 23, 42, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-system);
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .screen { display: none; width: 100%; max-width: 480px; }
+  .screen.active { display: block; }
+
+  /* Welcome screen */
+  .welcome-box { text-align: center; }
+  .logo { font-size: 48px; margin-bottom: 12px; }
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .subtitle { color: var(--color-text-muted); font-size: 15px; line-height: 1.5; margin-bottom: 36px; }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 16px 36px;
+    background: var(--color-tree);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22,101,52,0.25); }
+
+  /* Choice screen */
+  .choice-header { text-align: center; margin-bottom: 28px; }
+  .choice-header h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .choice-header p { color: var(--color-text-muted); font-size: 14px; }
+
+  .card-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+
+  .feature-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 18px 20px;
+    text-decoration: none;
+    color: var(--color-text);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .feature-card:hover { transform: translateY(-2px); }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .icon-footprint { background: var(--color-tree-bg); }
+  .icon-report { background: var(--color-water-bg); }
+  .icon-map { background: #fef3c7; }
+  .icon-timeline { background: #ede9fe; }
+
+  .card-text h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .card-text p { font-size: 13px; color: var(--color-text-muted); }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 0;
+  }
+  .back-link:hover { color: var(--color-text); }
+</style>
+</head>
+<body>
+
+  <div class="screen active" id="welcomeScreen">
+    <div class="welcome-box">
+      <div class="logo">🌿</div>
+      <h1>EcoSanskriti</h1>
+      <p class="subtitle">Connecting personal responsibility with grassroot-level environmental change.</p>
+      <button class="btn-primary" onclick="goTo('choiceScreen')">Get Started →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="choiceScreen">
+    <div class="choice-header">
+      <h2>What would you like to do?</h2>
+      <p>Choose an option to continue</p>
+    </div>
+
+    <div class="card-grid">
+      <a class="feature-card" href="footprint.html">
+        <div class="card-icon icon-footprint">🧮</div>
+        <div class="card-text">
+          <h3>Calculate My Footprint</h3>
+          <p>See your personal carbon footprint score</p>
+        </div>
+      </a>
+
+      <a class="feature-card" href="report.html">
+        <div class="card-icon icon-report">📍</div>
+        <div class="card-text">
+          <h3>Report an Issue</h3>
+          <p>Report a tree or water body issue near you</p>
+        </div>
+      </a>
+
+      <a class="feature-card" href="map.html">
+        <div class="card-icon icon-map">🗺️</div>
+        <div class="card-text">
+          <h3>View the Map</h3>
+          <p>See all reported issues on the map</p>
+        </div>
+      </a>
+
+      <a class="feature-card" href="timeline.html">
+        <div class="card-icon icon-timeline">📈</div>
+        <div class="card-text">
+          <h3>View Timeline</h3>
+          <p>See report history by location</p>
+        </div>
+      </a>
+    </div>
+
+    <a class="back-link" href="#" onclick="goTo('welcomeScreen'); return false;">← Back</a>
+  </div>
+
+  <script>
+    function goTo(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVS — Environmental Vigilance Map</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-surface-hover: #f1f5f9;
+      --color-border: #e2e8f0;
+      --color-border-subtle: #cbd5e1;
+      --color-text: #0f172a;
+      --color-text-muted: #475569;
+
+      --color-tree: #166534;
+      --color-tree-border: #14532d;
+      --color-tree-bg: #dcfce7;
+
+      --color-water: #0284c7;
+      --color-water-border: #ffffff;
+      --color-water-bg: #e0f2fe;
+
+      --color-accent: #c2410c;
+      --color-accent-bg: #ffedd5;
+
+      --color-error-bg: #fef2f2;
+      --color-error-border: #fecaca;
+      --color-error-text: #991b1b;
+
+      --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      --radius-card: 12px;
+      --radius-pill: 9999px;
+      --radius-control: 8px;
+      --shadow-soft: 0 4px 20px rgba(15, 23, 42, 0.08);
+      --shadow-popup: 0 6px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-system);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 24px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 16px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    .nav-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-back-link:hover {
+      background-color: var(--color-surface-hover);
+      color: var(--color-text);
+    }
+
+    .error-banner {
+      background-color: var(--color-error-bg);
+      border: 1px solid var(--color-error-border);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      color: var(--color-error-text);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .error-banner h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-banner p {
+      font-size: 0.875rem;
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .error-banner code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 560px;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      background-color: var(--color-surface);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 560px;
+      z-index: 1;
+    }
+
+    .legend-filter-card {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-soft);
+      width: 250px;
+      backdrop-filter: blur(4px);
+    }
+
+    .legend-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .legend-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .legend-counter {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .legend-counter strong {
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      padding: 8px 10px;
+      cursor: pointer;
+      font-family: var(--font-system);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text);
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--color-surface-hover);
+    }
+
+    .filter-btn-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .marker-symbol-tree {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: var(--color-tree);
+      border: 2px solid var(--color-tree-border);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .marker-symbol-water {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: var(--color-water);
+      border: 2px dashed #ffffff;
+      box-shadow: 0 0 0 1px var(--color-water);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .filter-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+    }
+
+    .filter-btn.is-active.filter-tree {
+      background-color: var(--color-tree-bg);
+      border-color: var(--color-tree);
+      color: var(--color-tree);
+    }
+    .filter-btn.is-active.filter-tree .filter-badge {
+      background-color: var(--color-tree);
+      color: #ffffff;
+      border-color: var(--color-tree);
+    }
+
+    .filter-btn.is-active.filter-water {
+      background-color: var(--color-water-bg);
+      border-color: var(--color-water);
+      color: var(--color-water);
+    }
+    .filter-btn.is-active.filter-water .filter-badge {
+      background-color: var(--color-water);
+      color: #ffffff;
+      border-color: var(--color-water);
+    }
+
+    .filter-btn.is-muted {
+      opacity: 0.45;
+      background-color: var(--color-bg);
+      border-style: dashed;
+    }
+    .filter-btn.is-muted .filter-btn-content span:last-child {
+      text-decoration: line-through;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--radius-card) !important;
+      box-shadow: var(--shadow-popup) !important;
+      padding: 0 !important;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.4 !important;
+    }
+
+    .report-popup {
+      padding: 16px;
+      min-width: 220px;
+      max-width: 300px;
+      font-family: var(--font-system);
+    }
+
+    .popup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 8px;
+    }
+
+    .popup-badge-tree {
+      background-color: var(--color-tree-bg);
+      color: var(--color-tree);
+      border: 1px solid rgba(22, 101, 52, 0.2);
+    }
+
+    .popup-badge-water {
+      background-color: var(--color-water-bg);
+      color: var(--color-water);
+      border: 1px solid rgba(2, 132, 199, 0.2);
+    }
+
+    .popup-subtype {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .popup-date {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .popup-location {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+      display: block;
+      font-style: italic;
+    }
+
+    .popup-note {
+      font-size: 0.875rem;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      padding: 8px 10px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-border);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+      .legend-filter-card {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">
+          <span>🌿</span> Environmental Vigilance Map
+        </h1>
+        <p class="page-subtitle">
+          Real-time reports across Bangalore urban wetlands and tree canopy
+        </p>
+      </div>
+      <a href="index.html" class="nav-back-link">
+        ← Back to Overview
+      </a>
+    </header>
+
+    <div id="error-banner" class="error-banner" role="alert" style="display: none;">
+      <h3>⚠️ Unable to Load Reports</h3>
+      <p id="error-message">
+        Could not load reports from the shared database.
+      </p>
+    </div>
+
+    <main class="map-wrapper">
+      <div id="map"></div>
+
+      <aside class="legend-filter-card" aria-label="Map Legend and Filters">
+        <div class="legend-header">
+          <span class="legend-title">Filter Reports</span>
+          <span class="legend-counter">
+            Showing <strong id="visible-count">0</strong>/<span id="total-count">0</span>
+          </span>
+        </div>
+
+        <div class="filter-options">
+          <button
+            type="button"
+            id="filter-tree-btn"
+            class="filter-btn filter-tree is-active"
+            aria-pressed="true"
+            title="Click to toggle Tree reports on the map"
+          >
+            <div class="filter-btn-content">
+              <span class="marker-symbol-tree" aria-hidden="true"></span>
+              <span>Trees</span>
+            </div>
+            <span id="tree-count" class="filter-badge">0</span>
+          </button>
+
+          <button
+            type="button"
+            id="filter-water-btn"
+            class="filter-btn filter-water is-active"
+            aria-pressed="true"
+            title="Click to toggle Water Body reports on the map"
+          >
+            <div class="filter-btn-content">
+              <span class="marker-symbol-water" aria-hidden="true"></span>
+              <span>Water</span>
+            </div>
+            <span id="water-count" class="filter-badge">0</span>
+          </button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGNvaYpodDmSyXIVtB_rjsGCnZxDnA5ns",
+      authDomain: "ecosanskriti-25254.firebaseapp.com",
+      projectId: "ecosanskriti-25254",
+      storageBucket: "ecosanskriti-25254.firebasestorage.app",
+      messagingSenderId: "664388803197",
+      appId: "1:664388803197:web:162e42d89bc2b1d59f2f14"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+  <script>
+    const cssTokens = getComputedStyle(document.documentElement);
+    const COLOR_TREE = cssTokens.getPropertyValue('--color-tree').trim();
+    const COLOR_TREE_BORDER = cssTokens.getPropertyValue('--color-tree-border').trim();
+    const COLOR_WATER = cssTokens.getPropertyValue('--color-water').trim();
+    const COLOR_WATER_BORDER = cssTokens.getPropertyValue('--color-water-border').trim();
+
+    const map = L.map('map').setView([12.9716, 77.5946], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let reportsData = [];
+    const reportMarkers = [];
+    const activeCategories = {
+      tree: true,
+      water: true
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function addReportPin(report) {
+      const isTree = report.category === 'tree';
+
+      const markerOptions = isTree
+        ? {
+            radius: 9,
+            fillColor: COLOR_TREE,
+            color: COLOR_TREE_BORDER,
+            weight: 2,
+            opacity: 1.0,
+            fillOpacity: 0.95
+          }
+        : {
+            radius: 11,
+            fillColor: COLOR_WATER,
+            color: COLOR_WATER_BORDER,
+            weight: 3,
+            dashArray: '3, 3',
+            opacity: 1.0,
+            fillOpacity: 0.90
+          };
+
+      const marker = L.circleMarker([report.lat, report.lng], markerOptions);
+
+      const badgeClass = isTree ? 'popup-badge-tree' : 'popup-badge-water';
+      const categoryLabel = isTree ? '🌳 Tree Report' : '💧 Water Body Report';
+
+      const popupHtml = `
+        <article class="report-popup">
+          <span class="popup-badge ${badgeClass}">${categoryLabel}</span>
+          <h3 class="popup-subtype">${escapeHtml(report.subtype)}</h3>
+          <time class="popup-date" datetime="${escapeHtml(report.timestamp)}">
+            Reported: ${escapeHtml(report.timestamp)}
+          </time>
+          ${report.locationName ? `<span class="popup-location">${escapeHtml(report.locationName)}</span>` : ''}
+          <p class="popup-note">${escapeHtml(report.note || 'No additional notes provided.')}</p>
+        </article>
+      `;
+
+      marker.bindPopup(popupHtml);
+
+      reportMarkers.push({ report, marker });
+
+      if (activeCategories[report.category]) {
+        marker.addTo(map);
+      }
+    }
+
+    function updateCounts() {
+      const treeTotal = reportsData.filter(r => r.category === 'tree').length;
+      const waterTotal = reportsData.filter(r => r.category === 'water').length;
+
+      let visibleCount = 0;
+      if (activeCategories.tree) visibleCount += treeTotal;
+      if (activeCategories.water) visibleCount += waterTotal;
+
+      document.getElementById('tree-count').textContent = treeTotal;
+      document.getElementById('water-count').textContent = waterTotal;
+      document.getElementById('visible-count').textContent = visibleCount;
+      document.getElementById('total-count').textContent = reportsData.length;
+    }
+
+    function toggleCategory(category) {
+      activeCategories[category] = !activeCategories[category];
+      const isNowActive = activeCategories[category];
+
+      const btn = document.getElementById(`filter-${category}-btn`);
+      btn.classList.toggle('is-active', isNowActive);
+      btn.classList.toggle('is-muted', !isNowActive);
+      btn.setAttribute('aria-pressed', isNowActive ? 'true' : 'false');
+
+      reportMarkers.forEach(({ report, marker }) => {
+        if (report.category === category) {
+          if (isNowActive) {
+            marker.addTo(map);
+          } else {
+            map.removeLayer(marker);
+          }
+        }
+      });
+
+      updateCounts();
+    }
+
+    document.getElementById('filter-tree-btn').addEventListener('click', () => {
+      toggleCategory('tree');
+    });
+
+    document.getElementById('filter-water-btn').addEventListener('click', () => {
+      toggleCategory('water');
+    });
+
+    function showFetchError(err) {
+      const banner = document.getElementById('error-banner');
+      const msg = document.getElementById('error-message');
+      msg.textContent = `Could not load reports from Firebase (${err.message}). Check your internet connection.`;
+      banner.style.display = 'block';
+    }
+
+   db.collection("reports").get()
+  .then((snapshot) => {
+    reportsData = snapshot.docs.map(doc => doc.data());
+
+    // Spread out pins that share the exact same coordinates, so each stays clickable
+    const seenCoords = {};
+    reportsData.forEach((report) => {
+      const key = report.lat + "," + report.lng;
+      const count = seenCoords[key] || 0;
+      seenCoords[key] = count + 1;
+
+      if (count > 0) {
+        const angle = count * 45 * (Math.PI / 180);
+        const offset = 0.0015 * count;
+        report.lat += offset * Math.cos(angle);
+        report.lng += offset * Math.sin(angle);
+      }
+    });
+
+    reportsData.forEach(addReportPin);
+    updateCounts();
+  })
+      .catch((error) => {
+        console.error('Failed to load reports from Firebase:', error);
+        showFetchError(error);
+      });
+  </script>
+</body>
+</html>
